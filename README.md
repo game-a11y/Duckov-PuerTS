@@ -57,24 +57,9 @@ mklink /d "D:\SteamLibrary\steamapps\common\Escape from Duckov\Duckov_Data\Mods\
 - 修复编译错误：CS8957，鸭科夫的 mod 使用 netstandard2.1，而 PuerTS 默认使用 net8.0，所以要做出一些调整。
   这里只需加一个中间变量，把三元表达式展开为 if 即可。  
   参考 0f3d11e 提交。
-- 从对应版本源码中更新以下文件
-  - `PuerTS\CommonJS.cs`
-  - `PuerTS\TxtLoader.cs`
 - 复制对应版本的 [`puer-commonjs\*.mjs`](https://github.com/Tencent/puerts/tree/f1088993639c353e9d2a0fb8d792592aa8bd1538/unity/Assets/commonjs/upm/Runtime/Resources/puer-commonjs) 到
   `upm\Runtime\Resources\puer-commonjs\*`。
-- 修复资源加载路径。
-  你在 `TxtLoader.cs` 中可以看见资源文件使用 `../../` 相对路径进行查找，需要修复。
-
-  ```diff
-  -    private string root = PathToBinDir("../../../../../Assets/core/upm/Runtime/Resources");
-  -    private string commonjsRoot = PathToBinDir("../../../../../Assets/commonjs/upm/Runtime/Resources");
-  -    private string editorRoot = PathToBinDir("../../../../../Assets/core/upm/Editor/Resources");
-  +    private string root = PathToBinDir("upm/Runtime/Resources");
-  +    private string commonjsRoot = PathToBinDir("upm/Runtime/Resources/");
-  +    private string editorRoot = PathToBinDir("upm/Editor/Resources");
-  ```
-
-  这里不用管单元测试的目录。
+- 尝试构建，并修复错误。
 
 
 ## Licence
