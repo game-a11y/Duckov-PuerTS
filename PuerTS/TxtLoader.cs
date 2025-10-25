@@ -16,9 +16,9 @@ public class TxtLoader : IResolvableLoader, ILoader, IModuleChecker
             appendix
         );
     }
-    private string root = PathToBinDir("Runtime/Resources");
-    private string commonjsRoot = PathToBinDir("Runtime/Resources/puer-commonjs");
-    private string editorRoot = PathToBinDir("../../../../../Assets/core/upm/Editor/Resources");
+    private string root = PathToBinDir("upm/Runtime/Resources");
+    private string commonjsRoot = PathToBinDir("upm/Runtime/Resources/");
+    private string editorRoot = PathToBinDir("upm/Editor/Resources");
     private string unittestRoot = PathToBinDir("../../../../Src/Resources");
 
     public bool IsESM(string filepath)
