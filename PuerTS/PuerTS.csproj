@@ -16,10 +16,13 @@
         <Reference Include="$(DuckovPath)\Duckov_Data\Managed\Unity*" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="PuerTS\**" />
     <Compile Remove="upm\Editor\**" />
     <Compile Remove="upm\Plugins\**" />
+    <EmbeddedResource Remove="PuerTS\**" />
     <EmbeddedResource Remove="upm\Editor\**" />
     <EmbeddedResource Remove="upm\Plugins\**" />
+    <None Remove="PuerTS\**" />
     <None Remove="upm\Editor\**" />
     <None Remove="upm\Plugins\**" />
   </ItemGroup>

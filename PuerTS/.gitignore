@@ -5,3 +5,6 @@ upm/Editor/
 upm/Plugins/
 upm/*.tar
 upm/*.tar.gz
+
+## PuerTS MOD release
+PuerTS/*
