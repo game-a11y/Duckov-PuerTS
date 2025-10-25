@@ -16,19 +16,22 @@ namespace PuerTS
         /// </summary>
         const string MOD_NAME = "PuerTS";
 
+        JsEnv? gJsEnv;
+
         void Awake()
         {
             Debug.Log($"[{MOD_NAME}]: MOD Start.");
 
             Debug.Log($"[{MOD_NAME}]: JsEnv init.");
-            var jsEnv = new JsEnv(new ResLoader());
+            gJsEnv = new JsEnv(new ResLoader());
             // `Scripts/` 已经在搜索路径中了，无需再添加
-            jsEnv.ExecuteModule("index.js");
-            jsEnv.Dispose();
+            gJsEnv.ExecuteModule("index.js");
         }
 
         void OnDestroy()
         {
+            if (gJsEnv != null)
+                gJsEnv.Dispose();
             Debug.Log($"[{MOD_NAME}]: MOD Destroy.");
         }
 
