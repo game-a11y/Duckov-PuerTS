@@ -17,6 +17,7 @@
 ### 构建
 
 - 拉取项目到本地
+- 修改 `PuerTS.csproj` 中的 `DuckovPath` 为你本地的鸭科夫游戏目录
 - 用 VS 2022 打开 `PuerTS\PuerTS.sln`
 - 下载 PuerTS [Unity_v3.0.0-preview0](https://github.com/Tencent/puerts/releases/tag/Unity_v3.0.0-preview0)
   - 下载 `PuerTS_Core_3.0.0-preview0.tar.gz` 和 `PuerTS_V8_3.0.0-preview0.tar.gz`
@@ -50,6 +51,12 @@ mklink /d "D:\SteamLibrary\steamapps\common\Escape from Duckov\Duckov_Data\Mods\
   - `preview.png`: mod 预览图
 - LICENSE: 许可证文件
 - README.md: 本文件
+
+## 参考资料
+
+- [xvrsl/duckov_modding](https://github.com/xvrsl/duckov_modding)
+- [在Javascript调用C | PUER Typescript](https://puerts.github.io/docs/puerts/unity/tutorial/js2cs)
+- [在C#中调用Javascript | PUER Typescript](https://puerts.github.io/docs/puerts/unity/tutorial/cs2js)
 
 ### 更新或切换 PuerTS 版本
 
