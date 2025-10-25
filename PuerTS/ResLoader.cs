@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-public class TxtLoader : IResolvableLoader, ILoader, IModuleChecker
+public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
 {
     public static string PathToBinDir(string appendix)
     {
@@ -141,7 +141,7 @@ namespace Puerts.UnitTest
     public class UnitTestEnv
     {
         private static JsEnv env;
-        private static TxtLoader loader;
+        private static ResLoader loader;
 
         UnitTestEnv() { }
 
@@ -149,7 +149,7 @@ namespace Puerts.UnitTest
         {
             if (env == null)
             {
-                loader = new TxtLoader();
+                loader = new ResLoader();
                 if (System.Environment.GetEnvironmentVariable("SwitchToQJS") == "1")
                 {
                     JsEnv.DefaultBackendType = BackendType.QuickJS;
@@ -174,7 +174,7 @@ namespace Puerts.UnitTest
             return env;
         }
 
-        public static TxtLoader GetLoader()
+        public static ResLoader GetLoader()
         {
             if (env == null) Init();
             return loader;

@@ -28,7 +28,7 @@ namespace PuerTS
         {
             Debug.Log("PuerTS Loaded!!!");
 
-            var jsEnv = new JsEnv(new TxtLoader());
+            var jsEnv = new JsEnv(new ResLoader());
             jsEnv.Eval(@"
                 CS.System.Console.WriteLine('hello world');
             ");
