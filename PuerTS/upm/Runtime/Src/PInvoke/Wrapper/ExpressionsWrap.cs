@@ -921,19 +921,8 @@ namespace Puerts
                 var res = scriptToNative(context, parameterInfo.ParameterType, value);
                 if (parameterInfo.HasDefaultValue)
                 {
-                    Expression ifTrueCase;
-
-                    bool bCase = parameterInfo.DefaultValue == null && parameterInfo.ParameterType.IsValueType;
-                    if (bCase)
-                    {
-                        ifTrueCase = Expression.Default(parameterInfo.ParameterType);
-                    }
-                    else
-                    {
-                        ifTrueCase = Expression.Constant(parameterInfo.DefaultValue, parameterInfo.ParameterType);
-                    }
-
-                    return Expression.Condition(callPApi(context.Apis, "is_undefined", context.Env, value), ifTrueCase, res);
+                    return Expression.Condition(callPApi(context.Apis, "is_undefined", context.Env, value),
+                        parameterInfo.DefaultValue == null && parameterInfo.ParameterType.IsValueType ? Expression.Default(parameterInfo.ParameterType) : Expression.Constant(parameterInfo.DefaultValue, parameterInfo.ParameterType), res);
                 }
                 else
                 {

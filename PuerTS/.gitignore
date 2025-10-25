@@ -1,2 +1,7 @@
-# PuerTS upm
-upm/
+
+## PuerTS upm
+upm/Editor/
+# Binary lib
+upm/Plugins/
+upm/*.tar
+upm/*.tar.gz

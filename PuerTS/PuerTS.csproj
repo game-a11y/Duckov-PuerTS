@@ -16,8 +16,15 @@
         <Reference Include="$(DuckovPath)\Duckov_Data\Managed\Unity*" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="upm\**" />
-    <EmbeddedResource Remove="upm\**" />
-    <None Remove="upm\**" />
+    <Compile Remove="upm\Editor\**" />
+    <Compile Remove="upm\Plugins\**" />
+    <EmbeddedResource Remove="upm\Editor\**" />
+    <EmbeddedResource Remove="upm\Plugins\**" />
+    <None Remove="upm\Editor\**" />
+    <None Remove="upm\Plugins\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="upm\*.tar" />
+    <None Remove="upm\*.tar.gz" />
   </ItemGroup>
 </Project>
