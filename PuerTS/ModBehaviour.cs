@@ -1,7 +1,8 @@
-﻿using System;
-using Duckov.UI;
+﻿using Duckov.UI;
 using Duckov.Utilities;
 using ItemStatsSystem;
+using Puerts;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,6 +27,13 @@ namespace PuerTS
         void Awake()
         {
             Debug.Log("PuerTS Loaded!!!");
+
+            var jsEnv = new JsEnv(new TxtLoader());
+            jsEnv.Eval(@"
+                CS.System.Console.WriteLine('hello world');
+            ");
+            jsEnv.Dispose();
+
         }
         void OnDestroy()
         {
