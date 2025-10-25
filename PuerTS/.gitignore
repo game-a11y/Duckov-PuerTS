@@ -8,3 +8,5 @@ upm/*.tar.gz
 
 ## PuerTS MOD release
 PuerTS/*
+*.zip
+*.7z
