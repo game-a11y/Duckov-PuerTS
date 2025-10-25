@@ -4,6 +4,7 @@ echo Copying Assets to Release Dir
 @REM xcopy %1\upm\    %1\PuerTS\upm\  /E /Y
 xcopy %1\upm\Editor\Resources\      %1\PuerTS\upm\Editor\Resources\  /E /Y
 xcopy %1\upm\Runtime\Resources\     %1\PuerTS\upm\Runtime\Resources\  /E /Y
+xcopy %1\Scripts\                   %1\PuerTS\Scripts\  /E /Y
 copy %1\upm\LICENSE         %1\PuerTS\upm\
 copy %1\upm\package.json    %1\PuerTS\upm\
 copy %1\upm\Plugins\x86_64\*.dll    %1\PuerTS\

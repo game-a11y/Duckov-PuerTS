@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
+/*
+    修改自 https://github.com/Tencent/puerts/blob/f1088993639c353e9d2a0fb8d792592aa8bd1538/unity/test/dotnet/Src/TxtLoader.cs
+ */
 public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
 {
     public static string PathToBinDir(string appendix)
@@ -19,7 +22,7 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
     private string root = PathToBinDir("upm/Runtime/Resources");
     private string commonjsRoot = PathToBinDir("upm/Runtime/Resources/");
     private string editorRoot = PathToBinDir("upm/Editor/Resources");
-    private string unittestRoot = PathToBinDir("../../../../Src/Resources");
+    private string scriptsRoot = PathToBinDir("Scripts");
 
     public bool IsESM(string filepath)
     {
@@ -55,7 +58,7 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
             return path.Replace("\\", "/");
         }
 
-        path = Path.Combine(unittestRoot, specifier);
+        path = Path.Combine(scriptsRoot, specifier);
         if (System.IO.File.Exists(path))
         {
             return path.Replace("\\", "/");
@@ -98,9 +101,9 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
         {
             debugpath = Path.Combine(editorRoot, filepath);
         }
-        if (File.Exists(Path.Combine(unittestRoot, filepath)))
+        if (File.Exists(Path.Combine(scriptsRoot, filepath)))
         {
-            debugpath = Path.Combine(unittestRoot, filepath);
+            debugpath = Path.Combine(scriptsRoot, filepath);
         }
 
         string mockContent;
@@ -133,51 +136,5 @@ namespace UnityEngine.Scripting
     class PreserveAttribute : System.Attribute
     {
 
-    }
-}
-
-namespace Puerts.UnitTest
-{
-    public class UnitTestEnv
-    {
-        private static JsEnv env;
-        private static ResLoader loader;
-
-        UnitTestEnv() { }
-
-        private static void Init()
-        {
-            if (env == null)
-            {
-                loader = new ResLoader();
-                if (System.Environment.GetEnvironmentVariable("SwitchToQJS") == "1")
-                {
-                    JsEnv.DefaultBackendType = BackendType.QuickJS;
-                }
-                else if (System.Environment.GetEnvironmentVariable("SwitchToNJS") == "1")
-                {
-                    JsEnv.DefaultBackendType = BackendType.Node;
-                }
-                System.Console.WriteLine($"---------------------DefaultBackendType: {JsEnv.DefaultBackendType}------------------------\n");
-                env = new JsEnv(loader);
-
-                CommonJS.InjectSupportForCJS(env);
-#if PUERTS_GENERAL && !TESTING_REFLECTION
-                PuertsStaticWrap.PuerRegisterInfo_Gen.AddRegisterInfoGetterIntoJsEnv(env);
-#endif
-            }
-        }
-
-        public static JsEnv GetEnv()
-        {
-            if (env == null) Init();
-            return env;
-        }
-
-        public static ResLoader GetLoader()
-        {
-            if (env == null) Init();
-            return loader;
-        }
     }
 }

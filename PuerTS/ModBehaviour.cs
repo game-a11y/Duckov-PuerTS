@@ -24,16 +24,16 @@ namespace PuerTS
                 return _text;
             }
         }
+
         void Awake()
         {
             Debug.Log("PuerTS Loaded!!!");
 
+            Debug.Log("PuerTS: JsEnv Start.");
             var jsEnv = new JsEnv(new ResLoader());
-            jsEnv.Eval(@"
-                CS.System.Console.WriteLine('hello world');
-            ");
+            // `Scripts/` 已经在搜索路径中了，无需再添加
+            jsEnv.ExecuteModule("index.js");
             jsEnv.Dispose();
-
         }
         void OnDestroy()
         {
