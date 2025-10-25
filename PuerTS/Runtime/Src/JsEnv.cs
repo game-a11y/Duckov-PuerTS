@@ -121,7 +121,10 @@ namespace Puerts
                         InitInnerEnv((BackendType)i, libVersionExpect, loader, debugPort);
                         found = true;
                         break;
-                    } catch (Exception e){ }
+                    } catch (Exception e){
+                        // breakpoint for debug
+                        found = false;
+                    }
                 }
                 if (!found)
                 {
