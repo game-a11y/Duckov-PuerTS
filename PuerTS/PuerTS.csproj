@@ -6,10 +6,18 @@
     <!-- 下面这行里填写你的鸭科夫安装路径，这样编译器就能找到相关的dll文件 -->
     <!-- <DuckovPath>E:\Program Files (x86)\Steam\steamapps\common\Escape from Duckov</DuckovPath> -->
     <DuckovPath>D:\SteamLibrary\steamapps\common\Escape from Duckov</DuckovPath>
+    <OutputType>Exe</OutputType>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
         <Reference Include="$(DuckovPath)\Duckov_Data\Managed\TeamSoda.*" />
         <Reference Include="$(DuckovPath)\Duckov_Data\Managed\ItemStatsSystem.dll" />
         <Reference Include="$(DuckovPath)\Duckov_Data\Managed\Unity*" />
-  </ItemGroup> 
+        <Reference Include="PuerTS\upm\Plugins\x86_64\*.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="upm\**" />
+    <EmbeddedResource Remove="upm\**" />
+    <None Remove="upm\**" />
+  </ItemGroup>
 </Project>
