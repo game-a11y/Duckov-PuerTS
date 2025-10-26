@@ -1,13 +1,16 @@
-/* 
-    必须导出 mod_Awake、mod_OnEnable、mod_OnDisable 三个函数，作为 mod 的生命周期函数。
-*/
 
 function log(msg) {
     var log_with_prefix = `[PuerTS.js] ${msg}`;
+    // 两种日志输出效果一样
     console.log(log_with_prefix);
     //CS.System.Console.WriteLine(log_with_prefix);
 }
 
+
+/**
+ * NOTE: 必须导出此 OnEnable/OnDisable/onDestroy 函数。
+ *      如果要变更函数名，请同步修改 C# 端的绑定代码
+ */
 class JsBehaviour {
     constructor(bindTo) {
         this.bindTo = bindTo;
@@ -32,7 +35,9 @@ class JsBehaviour {
     }
 }
 
-
+/**
+ * NOTE: 必须导出此 init 函数，以供初始化 js-C# 绑定
+ */
 export function init(bindTo) {
     new JsBehaviour(bindTo);
 }
