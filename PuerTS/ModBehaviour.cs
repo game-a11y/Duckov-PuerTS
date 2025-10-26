@@ -6,6 +6,7 @@ namespace PuerTS
 {
     public class ModBehaviour : Duckov.Modding.ModBehaviour
     {
+        // TODO: 或许可以使用父类的 ModInfo info 属性来获取模块名称
         /// <summary>
         /// 模块名称
         /// </summary>
@@ -16,6 +17,7 @@ namespace PuerTS
         public Action? JsOnDisable;
         public Action? JsOnDestroy;
 
+        // TODO: 修复过时的类使用，改用 ScriptEnv
         static JsEnv? jsEnv;
 
         void Awake()
@@ -25,8 +27,8 @@ namespace PuerTS
             Debug.Log($"[{MOD_NAME}]: JsEnv init with debugPort={DebugPort}");
             jsEnv = new JsEnv(new ResLoader(), DebugPort);
 
-            // `Scripts/` 已经在搜索路径中了，无需再添加
-            //jsEnv.ExecuteModule("index.mjs");
+            // TODO: 检查是否需要改成 Action<ModBehaviour>
+            // NOTE: `Scripts/` 文件夹已经在搜索路径中了，脚本路径无需再添加前缀
             var init = jsEnv.ExecuteModule<Action<MonoBehaviour>>("index.mjs", "init");
 
             if (init != null) init(this);
