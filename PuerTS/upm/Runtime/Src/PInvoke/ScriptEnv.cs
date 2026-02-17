@@ -79,14 +79,8 @@ namespace Puerts
 
             PuertsNative.pesapi_set_env_private(papis, env, new IntPtr(Idx));
 
-            // 这个和析构函数不一样，比如一个原生对象，如果传指针，不用做对象的delete，但如果宿主是带gc的语言，还是要处理引用持有的问题
-            // 不过析构那如果参数带上是否要析构，设计上可以不需要这个回调
-            // onObjectReleaseRef还有另外一个设定是和enter那配合使用，enter返回个userdata（比如objectPool索引），在exit那使用
-            onObjectReleaseRefDelegate = onObjectReleaseRef;
-            PuertsNative.pesapi_trace_native_object_lifecycle(papis, env, null, onObjectReleaseRefDelegate);
-
             var moduleExecutorFunc = this.backend.GetModuleExecutor(env);
-            moduleExecutor = ExpressionsWrap.GetNativeTranlator<Func<string, JSObject>>()(papis, env, moduleExecutorFunc);
+            moduleExecutor = ExpressionsWrap.GetNativeTranlator<Func<string, ScriptObject>>()(papis, env, moduleExecutorFunc);
 
             var globalVal = PuertsNative.pesapi_global(papis, env);
 
@@ -121,12 +115,17 @@ namespace Puerts
 
         private pesapi_callback loadTypeDelegate;
 
-        private pesapi_on_native_object_exit onObjectReleaseRefDelegate;
+        
 
-        private Func<string, JSObject> moduleExecutor;
+        private Func<string, ScriptObject> moduleExecutor;
 
-        private void onObjectReleaseRef(IntPtr ptr, IntPtr classData, IntPtr envPrivate, IntPtr userdata)
+        // 这个和析构函数不一样，比如一个原生对象，如果传指针，不用做对象的delete，但如果宿主是带gc的语言，还是要处理引用持有的问题
+        // 不过析构那如果参数带上是否要析构，设计上可以不需要这个回调
+        // onObjectReleaseRef还有另外一个设定是和enter那配合使用，enter返回个userdata（比如objectPool索引），在exit那使用
+        internal static void OnObjectReleaseRef(IntPtr ptr, IntPtr classData, IntPtr envPrivate, IntPtr userdata)
         {
+            var envIdx = envPrivate.ToInt32();
+            var objectPool = scriptEnvs[envIdx].objectPool;
             try
             {
                 objectPool.Remove(ptr.ToInt32());
@@ -138,6 +137,8 @@ namespace Puerts
             }
         }
 
+        internal static pesapi_on_native_object_exit OnObjectReleaseRefDelegate = OnObjectReleaseRef;
+
         [UnityEngine.Scripting.Preserve]
         public Type GetTypeByString(string className)
         {
@@ -148,6 +149,13 @@ namespace Puerts
         public object GetLoader()
         {
             return backend.GetLoader();
+        }
+
+        [UnityEngine.Scripting.Preserve]
+        public void LoadAddon(string name)
+        {
+            Type type = PuertsIl2cpp.TypeUtils.GetType("Puerts." + name + "Native");
+            type.GetMethod("Register").Invoke(null, new object[] { PuertsNative.GetRegisterApi(), TypeRegister.Instance.Registry });
         }
 
         [MonoPInvokeCallback(typeof(pesapi_callback))]
@@ -184,7 +192,7 @@ namespace Puerts
 
         pesapi_callback createFunctionDelegate;
 
-        public JSObject ExecuteModule(string specifier)
+        public ScriptObject ExecuteModule(string specifier)
         {
 #if THREAD_SAFE
             lock(this) {
@@ -285,20 +293,20 @@ namespace Puerts
         }
 #endif
 
-        List<WeakReference<JSObject>> allocedJsObject = new List<WeakReference<JSObject>>();
+        List<WeakReference<ScriptObject>> allocedJsScriptObject = new List<WeakReference<ScriptObject>>();
 
-        internal void addAllocedJsObject(JSObject obj)
+        internal void addAllocedScriptObject(ScriptObject obj)
         {
-            foreach (var weakRef in allocedJsObject)
+            foreach (var weakRef in allocedJsScriptObject)
             {
-                JSObject d;
+                ScriptObject d;
                 if (!weakRef.TryGetTarget(out d))
                 {
                     weakRef.SetTarget(obj);
                     return;
                 }
             }
-            allocedJsObject.Add(new WeakReference<JSObject>(obj));
+            allocedJsScriptObject.Add(new WeakReference<ScriptObject>(obj));
         }
 
         List<IntPtr> pendingKillScriptObjectRefs = new List<IntPtr>();
@@ -327,7 +335,7 @@ namespace Puerts
                         var objRef = pendingKillScriptObjectRefs[lastIndex];
                         pendingKillScriptObjectRefs.RemoveAt(lastIndex);
 
-                        JSObject.ReleaseObjRef(papis, env, objRef, false);
+                        ScriptObject.ReleaseObjRef(papis, env, objRef, false);
                     }
                 }
                 finally
@@ -362,19 +370,18 @@ namespace Puerts
             GC.WaitForPendingFinalizers();
             cleanupPendingKillScriptObjects();
 
-            foreach (var weakRef in allocedJsObject)
+            foreach (var weakRef in allocedJsScriptObject)
             {
-                JSObject obj;
+                ScriptObject obj;
                 if (weakRef.TryGetTarget(out obj))
                 {
                     obj.ForceDispose();
                 }
             }
-            allocedJsObject.Clear();
+            allocedJsScriptObject.Clear();
 
             var scope = PuertsNative.pesapi_open_scope(papis, envRef);
             var env = PuertsNative.pesapi_get_env_from_ref(papis, envRef);
-            PuertsNative.pesapi_trace_native_object_lifecycle(papis, env, null, null);
             PuertsNative.pesapi_close_scope(papis, scope);
 
             backend.DestroyEnvRef(envRef);

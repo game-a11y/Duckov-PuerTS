@@ -144,7 +144,7 @@ namespace Puerts
                 return PuertsNative.pesapi_create_string_utf16(apis, env, utf16, new UIntPtr((uint)str.Length));
             }
 
-            public static IntPtr NativeToScript_ScriptObject(IntPtr apis, IntPtr env, JSObject obj)
+            public static IntPtr NativeToScript_ScriptObject(IntPtr apis, IntPtr env, ScriptObject obj)
             {
                 if (obj == null)
                 {
@@ -158,7 +158,7 @@ namespace Puerts
 
                 // apis is the same, using apis
                 var objEnvRef = PuertsNative.pesapi_get_ref_associated_env(apis, obj.objRef);
-                if (!PuertsNative.pesapi_env_ref_is_valid(apis, objEnvRef))
+                if (objEnvRef == IntPtr.Zero || !PuertsNative.pesapi_env_ref_is_valid(apis, objEnvRef))
                 {
                     throw new InvalidCastException("ScriptObject env is invalid!");
                 }
@@ -170,7 +170,7 @@ namespace Puerts
                 PuertsNative.pesapi_close_scope(apis, scope);
                 if (!isEnvEq)
                 {
-                    throw new InvalidCastException("ScriptObject own by anther env");
+                    throw new InvalidCastException("ScriptObject own by anther env!");
                 }
                 return PuertsNative.pesapi_get_value_from_ref(apis, env, obj.objRef);
             }
@@ -227,21 +227,29 @@ namespace Puerts
                 {
                     return NativeToScript_String(apis, env, strValue);
                 }
-                else if (t is JSObject jsObject)
+                else if (t is ScriptObject scriptObject)
                 {
-                    return NativeToScript_ScriptObject(apis, env, jsObject);
+                    return NativeToScript_ScriptObject(apis, env, scriptObject);
                 }
                 else if (t is ArrayBuffer arrayBuffer)
                 {
                     return NativeToScript_ArrayBuffer(apis, env, arrayBuffer);
                 }
-                else if (!t.GetType().IsValueType)
+                Type type = t.GetType();
+                if (!type.IsValueType)
                 {
                     return NativeToScript_T<object>(apis, env, t);
                 }
-                else if(t.GetType().IsValueType && !t.GetType().IsPrimitive)
+                else if(type.IsValueType && !type.IsPrimitive)
                 {
-                    return NativeToScript_ValueType_Boxed(apis, env, t);
+                    if (type.IsEnum)
+                    {
+                        return NativeToScript_Object(apis, env, Convert.ChangeType(t, Enum.GetUnderlyingType(type)));
+                    }
+                    else
+                    {
+                        return NativeToScript_ValueType_Boxed(apis, env, t);
+                    }
                 }
                 throw new NotSupportedException($"NativeToScript_Object does not support type: {t.GetType()}");
             }
@@ -252,6 +260,12 @@ namespace Puerts
                 {
                     return PuertsNative.pesapi_create_null(apis, env);
                 }
+#if !PUERTS_GENERAL
+                if (value is UnityEngine.Object && (value as UnityEngine.Object) == null)
+                {
+                    return PuertsNative.pesapi_create_null(apis, env);
+                }
+#endif
                 var envIdx = PuertsNative.pesapi_get_env_private(apis, env).ToInt32();
                 var objectPool = ScriptEnv.scriptEnvs[envIdx].objectPool;
                 var typeId = TypeRegister.Instance.FindOrAddTypeId(value.GetType());
@@ -298,7 +312,12 @@ namespace Puerts
                 return typeId != 0 && typeof(TValueType).IsAssignableFrom(TypeRegister.Instance.FindTypeById(typeId));
             }
 
-            public static JSObject ScriptToNative_ScriptObject(IntPtr apis, IntPtr env, IntPtr value)
+            public static ScriptObject ScriptToNative_ScriptObject_CheckObject(IntPtr apis, IntPtr env, IntPtr value)
+            {
+                return PuertsNative.pesapi_is_object(apis, env, value) ? ScriptToNative_ScriptObject(apis, env, value) : null;
+            }
+
+            public static ScriptObject ScriptToNative_ScriptObject(IntPtr apis, IntPtr env, IntPtr value)
             {
                 IntPtr valueRef;
                 bool hasLastRef = true;
@@ -319,18 +338,18 @@ namespace Puerts
                     Marshal.StructureToPtr(IntPtr.Zero, weakHandlePtr, false);
                 }
 
-                JSObject ret = null;
+                ScriptObject ret = null;
 
                 IntPtr weakHandle = Marshal.PtrToStructure<IntPtr>(weakHandlePtr);
 
                 if (weakHandle != IntPtr.Zero)
                 {
-                    ret = GCHandle.FromIntPtr(weakHandle).Target as JSObject;
+                    ret = GCHandle.FromIntPtr(weakHandle).Target as ScriptObject;
                 }
                 if (ret == null)
                 {
                     var envIdx = PuertsNative.pesapi_get_env_private(apis, env).ToInt32();
-                    ret = new JSObject(ScriptEnv.scriptEnvs[envIdx], apis, valueRef);
+                    ret = new ScriptObject(ScriptEnv.scriptEnvs[envIdx], apis, valueRef);
                     weakHandle = GCHandle.ToIntPtr(GCHandle.Alloc(ret, GCHandleType.Weak));
                     Marshal.StructureToPtr(weakHandle, weakHandlePtr, false);
                 }
@@ -552,7 +571,7 @@ namespace Puerts
             {
                 return callPApi(context.Apis, "create_int32", context.Env, Expression.Convert(value, typeof(int)));
             }
-            else if (tranType == typeof(JSObject))
+            else if (tranType == typeof(ScriptObject))
             {
                 var toScriptMethod = Helpper.GetMethod(nameof(Helpper.NativeToScript_ScriptObject));
                 return Expression.Call(toScriptMethod, context.Apis, context.Env, value);
@@ -624,7 +643,7 @@ namespace Puerts
             // cache existed?
             var result = Expression.Variable(type);
             outsideContext.Variables.Add(result);
-            var tryGetMethod = typeof(JSObject).GetMethod(nameof(JSObject.tryGetCachedDelegate)).MakeGenericMethod(type);
+            var tryGetMethod = typeof(ScriptObject).GetMethod(nameof(ScriptObject.tryGetCachedDelegate)).MakeGenericMethod(type);
             var callTryGet = Expression.Call(
                 scriptObject,
                 tryGetMethod,
@@ -648,11 +667,11 @@ namespace Puerts
 
             var apis = Expression.Variable(typeof(IntPtr));
             lambdaVariables.Add(apis);
-            lambdaExpressions.Add(Expression.Assign(apis, Expression.Field(scriptObject, nameof(JSObject.apis))));
+            lambdaExpressions.Add(Expression.Assign(apis, Expression.Field(scriptObject, nameof(ScriptObject.apis))));
 
             var funcRef = Expression.Variable(typeof(IntPtr));
             lambdaVariables.Add(funcRef);
-            lambdaExpressions.Add(Expression.Assign(funcRef, Expression.Field(scriptObject, nameof(JSObject.objRef))));
+            lambdaExpressions.Add(Expression.Assign(funcRef, Expression.Field(scriptObject, nameof(ScriptObject.objRef))));
 
             var envRef = Expression.Variable(typeof(IntPtr));
             lambdaVariables.Add(envRef);
@@ -717,7 +736,7 @@ namespace Puerts
             lambdaExpressions.Add(Expression.TryFinally(Expression.Block(tryBlockvariables, tryBlockExpressions), callPApi(apis, "close_scope", scope)));
             var lambda = Expression.Lambda(type, Expression.Block(lambdaVariables, lambdaExpressions), delegateParams);
 
-            var cacheMethod = typeof(JSObject).GetMethod(nameof(JSObject.cacheDelegate)).MakeGenericMethod(type);
+            var cacheMethod = typeof(ScriptObject).GetMethod(nameof(ScriptObject.cacheDelegate)).MakeGenericMethod(type);
             
             var condition = Expression.Condition(
                 callTryGet,
@@ -730,6 +749,11 @@ namespace Puerts
 
         private static Expression scriptToNative(CompileContext context, Type type, Expression value)
         {
+            Type underlyingType = Nullable.GetUnderlyingType(type);
+            if (underlyingType != null)
+            {
+                return Expression.Condition(callPApi(context.Apis, "is_null", context.Env, value), Expression.Constant(null, type), Expression.Convert(scriptToNative(context, underlyingType, value), type));
+            }
             Type tranType = type.IsEnum ? Enum.GetUnderlyingType(type) : type;
             Expression ret = null;
             if (tranType == typeof(int))
@@ -795,9 +819,9 @@ namespace Puerts
                 var scriptToNativeMethod = Helpper.GetMethod(nameof(Helpper.ScriptToNative_Object));
                 ret = Expression.Call(scriptToNativeMethod, context.Apis, context.Env, value);
             }
-            else if (typeof(JSObject) == tranType)
+            else if (typeof(ScriptObject) == tranType)
             {
-                var scriptToNativeMethod = Helpper.GetMethod(nameof(Helpper.ScriptToNative_ScriptObject));
+                var scriptToNativeMethod = Helpper.GetMethod(nameof(Helpper.ScriptToNative_ScriptObject_CheckObject));
                 ret = Expression.Call(scriptToNativeMethod, context.Apis, context.Env, value);
             }
             else if (typeof(Delegate).IsAssignableFrom(tranType) && tranType != typeof(Delegate) && tranType != typeof(MulticastDelegate))
@@ -814,7 +838,7 @@ namespace Puerts
                     Env = context.Env
                 };
 
-                var scriptObject = Expression.Variable(typeof(JSObject));
+                var scriptObject = Expression.Variable(typeof(ScriptObject));
                 ifTrueVariables.Add(scriptObject);
                 var scriptToNativeMethod = Helpper.GetMethod(nameof(Helpper.ScriptToNative_ScriptObject));
                 ifTrueExpressions.Add(Expression.Assign(scriptObject, Expression.Call(scriptToNativeMethod, context.Apis, context.Env, value)));
@@ -826,7 +850,7 @@ namespace Puerts
             }
             else if (tranType.IsByRef)
             {
-                ret = scriptToNative(context, type.GetElementType(), callPApi(context.Apis, "get_property_uint32", context.Env, value, Expression.Constant((uint)0)));
+                ret = scriptToNative(context, type.GetElementType(), callPApi(context.Apis, "unboxing", context.Env, value));
             }
             else if (!tranType.IsValueType)
             {
@@ -921,21 +945,10 @@ namespace Puerts
                 var res = scriptToNative(context, parameterInfo.ParameterType, value);
                 if (parameterInfo.HasDefaultValue)
                 {
-                    //return Expression.Condition(callPApi(context.Apis, "is_undefined", context.Env, value),
-                    //    parameterInfo.DefaultValue == null && parameterInfo.ParameterType.IsValueType ? Expression.Default(parameterInfo.ParameterType) : Expression.Constant(parameterInfo.DefaultValue, parameterInfo.ParameterType), res);
-                    Expression ifTrueCase;
-
-                    bool bCase = parameterInfo.DefaultValue == null && parameterInfo.ParameterType.IsValueType;
-                    if (bCase)
-                    {
-                        ifTrueCase = Expression.Default(parameterInfo.ParameterType);
-                    }
-                    else
-                    {
-                        ifTrueCase = Expression.Constant(parameterInfo.DefaultValue, parameterInfo.ParameterType);
-                    }
-
-                    return Expression.Condition(callPApi(context.Apis, "is_undefined", context.Env, value), ifTrueCase, res);
+                    return Expression.Condition(callPApi(context.Apis, "is_undefined", context.Env, value),
+                        (parameterInfo.DefaultValue == null && parameterInfo.ParameterType.IsValueType) 
+                        ? ((Expression)Expression.Default(parameterInfo.ParameterType)) 
+                        : ((Expression)Expression.Constant(parameterInfo.DefaultValue, parameterInfo.ParameterType)), res);
                 }
                 else
                 {
@@ -983,7 +996,7 @@ namespace Puerts
             {
                 return Expression.Constant(true); // accpet any type
             }
-            else if (type == typeof(JSObject))
+            else if (type == typeof(ScriptObject))
             {
                 return directCheckArgumentConditions(context.Apis, context.Env, value, "is_null", "is_undefined", "is_object");
             }
@@ -1106,6 +1119,11 @@ namespace Puerts
                 Expression.AndAlso(left, right));
         }
 
+        private static Expression buildAndExpression(params Expression[] conditions)
+        {
+            return buildAndExpression((IEnumerable<Expression>)conditions);
+        }
+
         private static Expression buildArgumentsLengthCheck(MethodBase methodBase, bool isExtensionMethod, ParameterExpression jsArgc)
         {
             bool hasDefault = false;
@@ -1132,7 +1150,18 @@ namespace Puerts
 
             expectArgc -=  isExtensionMethod ? 1 : 0;
 
-            return (!hasDefault && !hasParams) ? Expression.Equal(jsArgc, Expression.Constant(expectArgc)) : Expression.GreaterThanOrEqual(jsArgc, Expression.Constant(expectArgc));
+            if (hasParams)
+            {
+                return Expression.GreaterThanOrEqual(jsArgc, Expression.Constant(expectArgc));
+            }
+            else if (hasDefault)
+            {
+                return buildAndExpression(Expression.GreaterThanOrEqual(jsArgc, Expression.Constant(expectArgc)), Expression.LessThanOrEqual(jsArgc, Expression.Constant(ps.Length)));
+            }
+            else
+            {
+                return Expression.Equal(jsArgc, Expression.Constant(expectArgc));
+            }
 
         }
 
@@ -1446,9 +1475,22 @@ namespace Puerts
             
         }
 
+        class DefaultStructConstructor
+        {
+            public DefaultStructConstructor()
+            {
+            }
+        }
+
         public static pesapi_constructor BuildConstructorWrap(Type type, ConstructorInfo[] constructorInfos, bool forceCheckArgs)
         {
-            return BuildMethodBaseWrap<pesapi_constructor>(type, constructorInfos, forceCheckArgs, (contextOutside, methodBase, info, self, getJsArg) =>
+            var methodBases = constructorInfos.ToList<MethodBase>();
+            if (type.IsValueType && !constructorInfos.Any(ctorInfo => ctorInfo.GetParameters().Length == 0))
+            {
+                methodBases.Add(typeof(DefaultStructConstructor).GetConstructor(Type.EmptyTypes)); // default constructor
+            }
+
+            return BuildMethodBaseWrap<pesapi_constructor>(type, methodBases.ToArray(), forceCheckArgs, (contextOutside, methodBase, info, self, getJsArg) =>
             {
                 var constructorInfo = methodBase as ConstructorInfo;
 
@@ -1462,27 +1504,41 @@ namespace Puerts
                     Env = contextOutside.Env
                 };
 
-                var tempVariables = constructorInfo.GetParameters().Select(pi => Expression.Variable(pi.ParameterType.IsByRef ? pi.ParameterType.GetElementType() : pi.ParameterType)).ToArray();
-                variables.AddRange(tempVariables);
-                var assignments = constructorInfo.GetParameters().Select((ParameterInfo pi, int index) => Expression.Assign(tempVariables[index], scriptToNative(context, pi, index, info, getJsArg(index))));
-                blockExpressions.AddRange(assignments);
+                ParameterExpression[] tempVariables = null;
+                Expression callNew = null;
+                bool isStructDefaultCtor = constructorInfo.DeclaringType == typeof(DefaultStructConstructor);
 
-                var callNew = Expression.New(constructorInfo, tempVariables);
+                if (!isStructDefaultCtor)
+                {
+                    tempVariables = constructorInfo.GetParameters().Select(pi => Expression.Variable(pi.ParameterType.IsByRef ? pi.ParameterType.GetElementType() : pi.ParameterType)).ToArray();
+                    variables.AddRange(tempVariables);
+                    var assignments = constructorInfo.GetParameters().Select((ParameterInfo pi, int index) => Expression.Assign(tempVariables[index], scriptToNative(context, pi, index, info, getJsArg(index))));
+                    blockExpressions.AddRange(assignments);
+
+                    callNew = Expression.New(constructorInfo, tempVariables);
+                }
+                else
+                {
+                    callNew = Expression.Default(type);
+                }
 
                 var result = Expression.Variable(typeof(IntPtr));
                 variables.Add(result);
-                var isValueType = constructorInfo.DeclaringType.IsValueType;
-                var addToObjectPoolMethod = isValueType ? Helpper.MakeGenericMethod(nameof(Helpper.AddValueType), constructorInfo.DeclaringType) : Helpper.GetMethod(nameof(Helpper.FindOrAddObject));
+                var isValueType = type.IsValueType;
+                var addToObjectPoolMethod = isValueType ? Helpper.MakeGenericMethod(nameof(Helpper.AddValueType), type) : Helpper.GetMethod(nameof(Helpper.FindOrAddObject));
                 var addToObjectPool = Expression.Call(addToObjectPoolMethod, context.Apis, context.Env, callNew);
                 blockExpressions.Add(Expression.Assign(result, addToObjectPool));
 
-                var parameters = methodBase.GetParameters();
-                for (int i = 0; i < parameters.Length; ++i)
+                if (!isStructDefaultCtor)
                 {
-                    var parameter = parameters[i];
-                    if (parameter.ParameterType.IsByRef)
+                    var parameters = methodBase.GetParameters();
+                    for (int i = 0; i < parameters.Length; ++i)
                     {
-                        blockExpressions.Add(callPApi(context.Apis, "update_boxed_value", context.Env, getJsArg(i), nativeToScript(context, parameter.ParameterType.GetElementType(), tempVariables[i])));
+                        var parameter = parameters[i];
+                        if (parameter.ParameterType.IsByRef)
+                        {
+                            blockExpressions.Add(callPApi(context.Apis, "update_boxed_value", context.Env, getJsArg(i), nativeToScript(context, parameter.ParameterType.GetElementType(), tempVariables[i])));
+                        }
                     }
                 }
 

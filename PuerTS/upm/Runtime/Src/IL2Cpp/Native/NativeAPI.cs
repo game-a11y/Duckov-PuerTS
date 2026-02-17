@@ -23,7 +23,7 @@ namespace Puerts
 
 #if !PUERTS_DISABLE_IL2CPP_OPTIMIZATION && ENABLE_IL2CPP
         [DllImport("__Internal", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void InitialPuerts(IntPtr PesapiImpl);
+        public static extern void InitialPuerts(IntPtr reg_api, IntPtr registry);
 
         [DllImport("__Internal", CallingConvention = CallingConvention.Cdecl)]
         public static extern void AddPendingKillScriptObjects(IntPtr ffiApi, IntPtr jsEnv, IntPtr valueRef);
@@ -67,7 +67,7 @@ namespace Puerts
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static void SetGlobalType_JSObject(Type type)
+        public static void SetGlobalType_ScriptObject(Type type)
         {
             throw new NotImplementedException();
         }

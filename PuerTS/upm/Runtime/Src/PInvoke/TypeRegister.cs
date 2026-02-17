@@ -308,7 +308,7 @@ namespace Puerts
                     var ctors = type.GetConstructors()
                         .Where(ctorInfo => !ctorInfo.GetParameters().Any(pi => parameterTypeNotAcceptable(pi.ParameterType)))
                         .ToArray();
-                    if (ctors.Length > 0)
+                    if (ctors.Length > 0 || type.IsValueType)
                     {
                         ctorWrap = ExpressionsWrap.BuildConstructorWrap(type, ctors, false);
                     }
@@ -332,7 +332,7 @@ namespace Puerts
                 };
             }
             callbacksCache.Add(ctorWrap);
-            reg_api.define_class(registry, new IntPtr(typeId), new IntPtr(baseTypeId), type.Namespace, type.Name, ctorWrap, null, IntPtr.Zero, true);
+            reg_api.define_class(registry, new IntPtr(typeId), new IntPtr(baseTypeId), type.Namespace, type.Name, ctorWrap, null, IntPtr.Zero, true, true);
             ++staticMethodCount; // for __p_innerType
             reg_api.set_property_info_size(registry, new IntPtr(typeId), instanceMethodCount, staticMethodCount, instancePropertyCount, staticPropertyCount);
 
@@ -367,6 +367,8 @@ namespace Puerts
 #endif
                 }
             }
+
+            reg_api.trace_native_object_lifecycle(registry, new IntPtr(typeId), null, ScriptEnv.OnObjectReleaseRefDelegate);
 
             registerFinished[typeId] = true;
             return typeId;

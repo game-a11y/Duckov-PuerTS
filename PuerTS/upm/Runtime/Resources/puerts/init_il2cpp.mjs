@@ -117,6 +117,16 @@ puer.loadFile = loadFile;
 
 puer.fileExists = loader.FileExists.bind(loader);
 
+function loadAddon(name) {
+    scriptEnv.LoadAddon(name);
+}
+
+puer.loadAddon = loadAddon;
+
+if (typeof global.findClassByName == 'function') {
+    puer.findClassByName = findClassByName;
+}
+
 global.__tgjsRegisterTickHandler = function(fn) {
     fn = new CS.System.Action(fn);
     scriptEnv.TickHandler = CS.System.Delegate.Combine(scriptEnv.TickHandler, fn)

@@ -68,22 +68,22 @@ namespace Puerts
 #if !UNITY_EDITOR && UNITY_WEBGL
             if (backendExpect == BackendType.WebGL)
             {
-                Backend = Activator.CreateInstance(Type.GetType("Puerts.BackendWebGL"), loader) as Backend;
+                Backend = Activator.CreateInstance(PuertsIl2cpp.TypeUtils.GetType("Puerts.BackendWebGL"), loader) as Backend;
             }
 #else
             if (backendExpect == BackendType.V8)
             {
-                Backend = Activator.CreateInstance(Type.GetType("Puerts.BackendV8"), loader) as Backend;
+                Backend = Activator.CreateInstance(PuertsIl2cpp.TypeUtils.GetType("Puerts.BackendV8"), loader) as Backend;
             }
 
             if (backendExpect == BackendType.Node)
             {
-                Backend = Activator.CreateInstance(Type.GetType("Puerts.BackendNodeJS"), loader) as Backend;
+                Backend = Activator.CreateInstance(PuertsIl2cpp.TypeUtils.GetType("Puerts.BackendNodeJS"), loader) as Backend;
             }
 #endif
             if (backendExpect == BackendType.QuickJS)
             {
-                Backend = Activator.CreateInstance(Type.GetType("Puerts.BackendQuickJS"), loader) as Backend;
+                Backend = Activator.CreateInstance(PuertsIl2cpp.TypeUtils.GetType("Puerts.BackendQuickJS"), loader) as Backend;
             }
             if (Backend == null)
             {
@@ -145,16 +145,16 @@ namespace Puerts
 
         public T ExecuteModule<T>(string specifier, string exportee)
         {
-            if (exportee == "" && typeof(T) != typeof(JSObject))
+            if (exportee == "" && typeof(T) != typeof(ScriptObject))
             {
-                throw new Exception("T must be Puerts.JSObject when getting the module namespace");
+                throw new Exception("T must be Puerts.ScriptObject when getting the module namespace");
             }
-            JSObject jso = env.ExecuteModule(specifier);
+            ScriptObject jso = env.ExecuteModule(specifier);
             if (exportee == "") return (T)(object)jso;
 
             return jso.Get<T>(exportee);
         }
-        public JSObject ExecuteModule(string specifier)
+        public ScriptObject ExecuteModule(string specifier)
         {
             return env.ExecuteModule(specifier);
         }
@@ -308,32 +308,35 @@ namespace Puerts
 #endif
 
         [MonoPInvokeCallback(typeof(LogCallback))]
-        public static void LogCallback(string msg)
+        public static void LogCallback(IntPtr msg)
         {
+            var msgStr = Marshal.PtrToStringUTF8(msg) ?? string.Empty;
 #if PUERTS_GENERAL || (UNITY_WSA && !UNITY_EDITOR)
-            Console.WriteLine(msg);
+            Console.WriteLine(msgStr);
 #else
-            UnityEngine.Debug.Log(msg);
+            UnityEngine.Debug.Log(msgStr);
 #endif
         }
 
         [MonoPInvokeCallback(typeof(LogCallback))]
-        public static void LogWarningCallback(string msg)
+        public static void LogWarningCallback(IntPtr msg)
         {
+            var msgStr = Marshal.PtrToStringUTF8(msg) ?? string.Empty;
 #if PUERTS_GENERAL || (UNITY_WSA && !UNITY_EDITOR)
-            Console.WriteLine(msg);
+            Console.WriteLine(msgStr);
 #else
-            UnityEngine.Debug.LogWarning(msg);
+            UnityEngine.Debug.LogWarning(msgStr);
 #endif
         }
 
         [MonoPInvokeCallback(typeof(LogCallback))]
-        public static void LogErrorCallback(string msg)
+        public static void LogErrorCallback(IntPtr msg)
         {
+            var msgStr = Marshal.PtrToStringUTF8(msg) ?? string.Empty;
 #if PUERTS_GENERAL || (UNITY_WSA && !UNITY_EDITOR)
-            Console.WriteLine(msg);
+            Console.WriteLine(msgStr);
 #else
-            UnityEngine.Debug.LogError(msg);
+            UnityEngine.Debug.LogError(msgStr);
 #endif
         }
 
