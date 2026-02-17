@@ -11,7 +11,7 @@
 
 - VS 2022 + .NET桌面开发环境。
     也可以使用你喜欢的 IDE，配合 DotNet SDK 进行开发。
-- PuerTS [Unity_v3.0.0-preview0](https://github.com/Tencent/puerts/releases/tag/Unity_v3.0.0-preview0)  
+- PuerTS [Unity_v3.0.0](https://github.com/Tencent/puerts/releases/tag/Unity_v3.0.0)  
   项目目前使用的组合是：`Core + V8`。你可以替换或添加你想要的后端支持。
 
 ### 构建
@@ -19,10 +19,10 @@
 - 拉取项目到本地
 - 修改 `PuerTS.csproj` 中的 `DuckovPath` 为你本地的鸭科夫游戏目录
 - 用 VS 2022 打开 `PuerTS\PuerTS.sln`
-- 下载 PuerTS [Unity_v3.0.0-preview0](https://github.com/Tencent/puerts/releases/tag/Unity_v3.0.0-preview0)
-  - 下载 `PuerTS_Core_3.0.0-preview0.tar.gz` 和 `PuerTS_V8_3.0.0-preview0.tar.gz`
-  - 找个地方解压得到 `upm` 文件夹
-  - 复制 `下载的\upm\Plugins` 到 `PuerTS\upm\Plugins` 目录下，覆盖同名文件夹。  
+- 下载 PuerTS [Unity_v3.0.0](https://github.com/Tencent/puerts/releases/tag/Unity_v3.0.0)
+  - 下载 `PuerTS_Core_3.0.0.tar.gz` 和 `PuerTS_V8_3.0.0.tar.gz`
+  - 找个地方解压得到 `core, v8` 等文件夹（旧版为 `upm` 文件夹）
+  - 复制 `下载的\*\Plugins` 到 `PuerTS\upm\Plugins` 目录下，覆盖同名文件夹。  
     这里实际上需要的是 `upm\Plugins\x86_64` 中的 DLL 文件，因此你可以只添加这些文件
 - 构建项目。检查 `PuerTS\PuerTS\` 中是否生成的 mod 文件。
 - 安装 mod 到游戏中。
@@ -61,7 +61,7 @@ mklink /d "D:\SteamLibrary\steamapps\common\Escape from Duckov\Duckov_Data\Mods\
 ### 更新或切换 PuerTS 版本
 
 - 下载 Core 和需要的语言支持包，解压 upm 文件夹到 `PuerTS\` 中。
-- 修复编译错误：CS8957，鸭科夫的 mod 使用 netstandard2.1，而 PuerTS 默认使用 net8.0，所以要做出一些调整。
+- （可选）修复编译错误：CS8957，鸭科夫的 mod 使用 netstandard2.1，而 PuerTS 默认使用 net8.0，所以要做出一些调整。
   这里只需加一个中间变量，把三元表达式展开为 if 即可。  
   参考 0f3d11e 提交。
 - 复制对应版本的 [`puer-commonjs\*.mjs`](https://github.com/Tencent/puerts/tree/f1088993639c353e9d2a0fb8d792592aa8bd1538/unity/Assets/commonjs/upm/Runtime/Resources/puer-commonjs) 到
