@@ -7,6 +7,32 @@
 
 ## [Unreleased]
 
+### 新增
+
+- 添加 `VersionChecker`，在 `OnAfterSetup` 中自动检测 `info.ini` 版本与项目版本是否一致
+- `info.ini` 添加 `version` 和 `tags` 字段，游戏 `ModManager` 自动解析到 `ModInfo`
+- 添加 PowerShell 编译脚本 (`build.ps1`) 和打包脚本 (`package.ps1`)
+
+### 重构
+
+- `postbuild.bat` 重构为 `postbuild.ps1`，支持跨平台执行
+- 版本号统一放在 `Directory.Build.props` 中管理，两个子项目通过 `$(ModVersion)` / `$(RuntimeVersion)` 引用
+
+### 修复
+
+- 修复接口返回类型 nullable 不匹配（CS8766：`ILoader` / `IResolvableLoader` 返回 `string?`）
+- `postbuild.ps1` 先创建发布目录，防止首次构建因目录不存在而失败
+
+### 变更
+
+- 发布目录 LICENSE 重命名为带标识的文件名（`Puerts+V8-LICENSE.txt`、`Duckov-PuerTS-LICENSE.txt`）
+- 添加项目元数据（`Authors`、`Copyright`）
+- `postbuild.ps1` 增加 `CHANGELOG.md` 复制到发布目录
+
+### 文档
+
+- 更新 `README.md` 构建说明和项目结构
+
 ## [V0.4] - 2026-05-28
 
 ### 变更
