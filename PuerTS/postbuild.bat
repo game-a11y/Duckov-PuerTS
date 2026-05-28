@@ -13,6 +13,8 @@ copy %1\upm\Plugins\x86_64\*.dll    %1\PuerTS\
 copy %2\PuerTS.dll  %1\PuerTS\
 copy %2\PuerTS.pdb  %1\PuerTS\
 copy %2\PuerTS.deps.json    %1\PuerTS\
+copy %2\PuerTSRuntime.dll  %1\PuerTS\
+copy %2\PuerTSRuntime.pdb  %1\PuerTS\
 
 @REM Copy mod meta files
 copy %1\info.ini        %1\PuerTS\

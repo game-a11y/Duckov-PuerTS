@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AssemblyName>PuerTSRuntime</AssemblyName>
+    <RootNamespace>Puerts</RootNamespace>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <!-- Only compile PuerTS runtime sources, skip mod-specific code -->
+  <ItemGroup>
+    <Compile Include="upm/Runtime/Src/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="$(DuckovPath)\Duckov_Data\Managed\Unity*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="PuerTS\**" />
+    <Compile Remove="Scripts\**" />
+    <Compile Remove="upm\Editor\**" />
+    <Compile Remove="upm\Plugins\**" />
+    <Compile Remove="upm\Typing\**" />
+    <EmbeddedResource Remove="PuerTS\**" />
+    <EmbeddedResource Remove="Scripts\**" />
+    <EmbeddedResource Remove="upm\Editor\**" />
+    <EmbeddedResource Remove="upm\Plugins\**" />
+    <EmbeddedResource Remove="upm\Typing\**" />
+    <None Remove="PuerTS\**" />
+    <None Remove="Scripts\**" />
+    <None Remove="upm\Editor\**" />
+    <None Remove="upm\Plugins\**" />
+    <None Remove="upm\Typing\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="info.ini" />
+    <None Remove="postbuild.bat" />
+    <None Remove="preview.png" />
+    <None Remove="PuerTSMod-*.zip" />
+  </ItemGroup>
+
+</Project>
