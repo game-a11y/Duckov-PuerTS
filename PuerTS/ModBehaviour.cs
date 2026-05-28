@@ -35,6 +35,11 @@ namespace PuerTS
             if (init != null) init(this);
         }
 
+        void Update()
+        {
+            scriptEnv?.Tick();
+        }
+
         void OnDestroy()
         {
             if (JsOnDestroy != null) JsOnDestroy();
