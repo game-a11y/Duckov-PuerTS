@@ -41,7 +41,11 @@ namespace PuerTS
             JsOnDisable = null;
             JsOnDestroy = null;
 
-            if (jsEnv != null) jsEnv.Dispose();
+            if (jsEnv != null)
+            {
+                jsEnv.Dispose();
+                jsEnv = null;
+            }
             Debug.Log($"[{MOD_NAME}]: MOD Destroy.");
         }
 
