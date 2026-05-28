@@ -17,7 +17,7 @@
 ### 构建
 
 - 拉取项目到本地
-- 修改 `PuerTS.csproj` 中的 `DuckovPath` 为你本地的鸭科夫游戏目录
+- 修改 `Directory.Build.props` 中的 `DuckovPath` 为你本地的鸭科夫游戏目录
 - 用 VS 2022 打开 `PuerTS\PuerTS.sln`
 - 下载 PuerTS [Unity_v3.0.0](https://github.com/Tencent/puerts/releases/tag/Unity_v3.0.0)
   - 下载 `PuerTS_Core_3.0.0.tar.gz` 和 `PuerTS_V8_3.0.0.tar.gz`
@@ -47,6 +47,8 @@ mklink /d "D:\SteamLibrary\steamapps\common\Escape from Duckov\Duckov_Data\Mods\
   - `upm\`: 上游 Tencent/PuerTS 依赖文件夹。仅包含纯文本的源码，不包含二进制文件。
   - `ModBehaviour.cs`: mod 主入口
   - `PuerTS.csproj`: mod 项目文件
+  - `PuerTSRuntime.csproj`: 上游运行时编译项目
+  - `Directory.Build.props`: 共享构建配置
   - `info.ini`: mod 信息文件
   - `preview.png`: mod 预览图
 - LICENSE: 许可证文件
