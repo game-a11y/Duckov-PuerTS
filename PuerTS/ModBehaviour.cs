@@ -25,14 +25,26 @@ namespace PuerTS
 
             Debug.Log($"[{MOD_NAME}]: ScriptEnv init with debugPort={DebugPort}");
 
-            var loader = new ResLoader();
-            var backend = new BackendV8(loader);
-            scriptEnv = new ScriptEnv(backend, DebugPort);
+            try
+            {
+                var loader = new ResLoader();
+                var backend = new BackendV8(loader);
+                scriptEnv = new ScriptEnv(backend, DebugPort);
 
-            // NOTE: `Scripts/` 文件夹已经在搜索路径中了，脚本路径无需再添加前缀
-            var init = scriptEnv.ExecuteModule("index.mjs").Get<Action<MonoBehaviour>>("init");
+                // NOTE: `Scripts/` 文件夹已经在搜索路径中了，脚本路径无需再添加前缀
+                var init = scriptEnv.ExecuteModule("index.mjs").Get<Action<MonoBehaviour>>("init");
 
-            if (init != null) init(this);
+                init?.Invoke(this);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{MOD_NAME}]: JS init failed - {e.Message}");
+                if (scriptEnv != null)
+                {
+                    scriptEnv.Dispose();
+                    scriptEnv = null;
+                }
+            }
         }
 
         void Update()
@@ -42,7 +54,8 @@ namespace PuerTS
 
         void OnDestroy()
         {
-            if (JsOnDestroy != null) JsOnDestroy();
+            try { JsOnDestroy?.Invoke(); }
+            catch (Exception e) { Debug.LogError($"[{MOD_NAME}]: OnDestroy error - {e.Message}"); }
             JsOnEnable = null;
             JsOnDisable = null;
             JsOnDestroy = null;
@@ -58,12 +71,14 @@ namespace PuerTS
         void OnEnable()
         {
             Debug.Log($"[{MOD_NAME}]: MOD Enable.");
-            if (JsOnEnable != null) JsOnEnable();
+            try { JsOnEnable?.Invoke(); }
+            catch (Exception e) { Debug.LogError($"[{MOD_NAME}]: OnEnable error - {e.Message}"); }
         }
 
         void OnDisable()
         {
-            if (JsOnDisable != null) JsOnDisable();
+            try { JsOnDisable?.Invoke(); }
+            catch (Exception e) { Debug.LogError($"[{MOD_NAME}]: OnDisable error - {e.Message}"); }
             Debug.Log($"[{MOD_NAME}]: MOD Disable.");
         }
 
