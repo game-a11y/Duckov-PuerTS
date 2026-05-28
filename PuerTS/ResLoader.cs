@@ -38,7 +38,7 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
         return res;
     }
 
-    private string TryResolve(string specifier)
+    private string? TryResolve(string specifier)
     {
         string path = Path.Combine(root, specifier);
         if (System.IO.File.Exists(path))
@@ -64,7 +64,7 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
         return null;
     }
 
-    public string Resolve(string specifier, string referrer)
+    public string? Resolve(string specifier, string referrer)
     {
         if (nullFiles.Contains(specifier))
         {
@@ -82,7 +82,7 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
         return null;
     }
 
-    public string ReadFile(string filepath, out string debugpath)
+    public string? ReadFile(string filepath, out string debugpath)
     {
         if (nullFiles.Contains(filepath))
         {
