@@ -11,6 +11,7 @@
 
 - 从已弃用的 `JsEnv` 迁移到 `ScriptEnv` + `BackendV8`
 - 重构 `ResLoader` 路径解析，`PathToBinDir` 增加 `Assembly.Location` fallback
+- 拆分上游运行时为独立项目 `PuerTSRuntime`，避免每次 mod 迭代重新编译 100+ 源文件
 
 ### 修复
 
