@@ -28,3 +28,4 @@ Copy-Item "$ProjectDir\info.ini" "$ProjectDir\PuerTS\" -Force
 Copy-Item "$ProjectDir\preview.png" "$ProjectDir\PuerTS\" -Force
 Copy-Item "$RepoRoot\LICENSE" "$ProjectDir\PuerTS\" -Force
 Copy-Item "$RepoRoot\README.md" "$ProjectDir\PuerTS\" -Force
+Copy-Item "$RepoRoot\CHANGELOG.md" "$ProjectDir\PuerTS\" -Force
