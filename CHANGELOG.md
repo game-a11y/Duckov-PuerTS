@@ -7,7 +7,7 @@
 
 ## [Unreleased]
 
-## [0.4] - 2026
+## [V0.4] - 2026-05-28
 
 ### 变更
 
@@ -37,7 +37,7 @@
 - 更新项目指南
 - 移除 README 中关于复制 `puer-commonjs` 的构建步骤
 
-## [0.3] - 2025
+## [V0.3] - 2026-02-18
 
 ### 变更
 
@@ -55,7 +55,7 @@
 
 - 示例/样板代码
 
-## [0.2]
+## [V0.2] - 2025-10-25
 
 ### 变更
 
@@ -70,7 +70,7 @@
 
 - 更新 README
 
-## [0.1] - 2025
+## [V0.1] - 2025-10-25
 
 ### 新增
 
@@ -78,3 +78,11 @@
 - PuerTS 集成，编译为类库
 - 构建产物自动复制到 mod 文件夹
 - PuerTS CommonJS 依赖
+
+
+<!-- Links -->
+
+[V0.4]: https://github.com/game-a11y/Duckov-PuerTS/releases/tag/v0.4
+[V0.3]: https://github.com/game-a11y/Duckov-PuerTS/releases/tag/v0.3
+[V0.2]: https://github.com/game-a11y/Duckov-PuerTS/releases/tag/v0.2
+[V0.1]: https://github.com/game-a11y/Duckov-PuerTS/releases/tag/v0.1
