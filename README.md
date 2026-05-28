@@ -60,7 +60,7 @@ mklink /d "D:\SteamLibrary\steamapps\common\Escape from Duckov\Duckov_Data\Mods\
 
 ### 更新或切换 PuerTS 版本
 
-- 下载 Core 和需要的语言支持包，解压 upm 文件夹到 `PuerTS\` 中。
+- 下载 Core 和需要的语言支持包，解压内容到 `PuerTS\upm` 中。
 - （可选）修复编译错误：CS8957，鸭科夫的 mod 使用 netstandard2.1，而 PuerTS 默认使用 net8.0，所以要做出一些调整。
   这里只需加一个中间变量，把三元表达式展开为 if 即可。  
   参考 0f3d11e 提交。
