@@ -25,6 +25,6 @@
     <ProjectReference Include="PuerTSRuntime.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="call postbuild.bat $(ProjectDir) $(TargetDir)" />
+    <Exec Command="powershell -NoProfile -File postbuild.ps1 $(ProjectDir) $(TargetDir)" />
   </Target>
 </Project>
