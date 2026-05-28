@@ -11,12 +11,15 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
 {
     public static string PathToBinDir(string appendix)
     {
-        return Path.Combine(
-            System.Text.RegularExpressions.Regex.Replace(
-                Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase), "^file:(\\\\)?", ""
-            ),
-            appendix
-        );
+        var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        if (string.IsNullOrEmpty(dir))
+        {
+            dir = System.Text.RegularExpressions.Regex.Replace(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) ?? "",
+                "^file:(\\\\)?", ""
+            );
+        }
+        return Path.Combine(dir ?? ".", appendix);
     }
     private string root = PathToBinDir("upm/Runtime/Resources");
     private string editorRoot = PathToBinDir("upm/Editor/Resources");
@@ -41,23 +44,23 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
     private string? TryResolve(string specifier)
     {
         string path = Path.Combine(root, specifier);
-        if (System.IO.File.Exists(path))
+        if (File.Exists(path))
         {
             return path.Replace("\\", "/");
         }
         path = Path.Combine(editorRoot, specifier);
-        if (System.IO.File.Exists(path))
+        if (File.Exists(path))
         {
             return path.Replace("\\", "/");
         }
 
         path = Path.Combine(scriptsRoot, specifier);
-        if (System.IO.File.Exists(path))
+        if (File.Exists(path))
         {
             return path.Replace("\\", "/");
         }
 
-        else if (mockFileContent.ContainsKey(specifier))
+        if (mockFileContent.ContainsKey(specifier))
         {
             return specifier;
         }
@@ -89,20 +92,22 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
             debugpath = string.Empty;
             return null;
         }
-        debugpath = Path.Combine(root, filepath);
-        if (File.Exists(Path.Combine(editorRoot, filepath)))
-        {
-            debugpath = Path.Combine(editorRoot, filepath);
-        }
-        if (File.Exists(Path.Combine(scriptsRoot, filepath)))
-        {
-            debugpath = Path.Combine(scriptsRoot, filepath);
-        }
 
         string mockContent;
         if (mockFileContent.TryGetValue(filepath, out mockContent))
         {
+            debugpath = filepath;
             return mockContent;
+        }
+
+        var resolved = TryResolve(filepath);
+        if (resolved != null)
+        {
+            debugpath = resolved;
+        }
+        else
+        {
+            debugpath = Path.Combine(root, filepath);
         }
 
         using (StreamReader reader = new StreamReader(debugpath))
