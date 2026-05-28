@@ -5,6 +5,12 @@ param(
 
 Write-Host "Copying Assets to Release Dir"
 
+# Ensure release directories exist
+$ReleaseDir = "$ProjectDir\PuerTS"
+$null = New-Item -ItemType Directory -Force "$ReleaseDir\upm\Editor\Resources"
+$null = New-Item -ItemType Directory -Force "$ReleaseDir\upm\Runtime\Resources"
+$null = New-Item -ItemType Directory -Force "$ReleaseDir\Scripts"
+
 # Copy Runtime files
 if (Test-Path "$ProjectDir\upm\Editor\Resources") {
     Copy-Item "$ProjectDir\upm\Editor\Resources\*" "$ProjectDir\PuerTS\upm\Editor\Resources\" -Recurse -Force
