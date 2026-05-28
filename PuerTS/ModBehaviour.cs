@@ -6,7 +6,6 @@ namespace PuerTS
 {
     public class ModBehaviour : Duckov.Modding.ModBehaviour
     {
-        // TODO: 或许可以使用父类的 ModInfo info 属性来获取模块名称
         /// <summary>
         /// 模块名称
         /// </summary>
@@ -18,6 +17,17 @@ namespace PuerTS
         public Action? JsOnDestroy;
 
         static ScriptEnv? scriptEnv;
+
+        protected override void OnAfterSetup()
+        {
+            Debug.Log($"[{info.name}] ==== ModInfo ====");
+            Debug.Log($"[{info.name}] {info.displayName} v{info.version}");
+            Debug.Log($"[{info.name}]   tags: #{info.tags}");
+            Debug.Log($"[{info.name}]   description: {info.description}");
+            Debug.Log($"[{info.name}]   isSteamItem: {info.isSteamItem};  steamId: {info.publishedFileId}");
+            Debug.Log($"[{info.name}]   path: {info.path}");
+            VersionChecker.WarnIfMismatch(info.version);
+        }
 
         void Awake()
         {
