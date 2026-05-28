@@ -1,5 +1,4 @@
 using Puerts;
-using Puerts.ThirdParty;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +19,6 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
         );
     }
     private string root = PathToBinDir("upm/Runtime/Resources");
-    private string commonjsRoot = PathToBinDir("upm/Runtime/Resources/");
     private string editorRoot = PathToBinDir("upm/Editor/Resources");
     private string scriptsRoot = PathToBinDir("Scripts");
 
@@ -43,11 +41,6 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
     private string TryResolve(string specifier)
     {
         string path = Path.Combine(root, specifier);
-        if (System.IO.File.Exists(path))
-        {
-            return path.Replace("\\", "/");
-        }
-        path = Path.Combine(commonjsRoot, specifier);
         if (System.IO.File.Exists(path))
         {
             return path.Replace("\\", "/");

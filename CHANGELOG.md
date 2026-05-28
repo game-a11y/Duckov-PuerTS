@@ -12,9 +12,14 @@
 - 更新 PuerTS_V8 到 v3.0.2
 - 更新 PuerTS_Core 到 v3.0.2
 
+### 移除
+
+- 移除已弃用的 CommonJS 支持（`CommonJS.cs`、`puer-commonjs`、`ResLoader` 中的冗余路径）
+
 ### 文档
 
 - 更新项目指南
+- 移除 README 中关于复制 `puer-commonjs` 的构建步骤
 
 ## [0.3] - 2025
 
