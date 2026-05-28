@@ -7,6 +7,13 @@
 
 ## [Unreleased]
 
+## [0.4] - 2026
+
+### 变更
+
+- 更新 PuerTS_V8 到 v3.0.2
+- 更新 PuerTS_Core 到 v3.0.2
+
 ### 重构
 
 - 从已弃用的 `JsEnv` 迁移到 `ScriptEnv` + `BackendV8`
