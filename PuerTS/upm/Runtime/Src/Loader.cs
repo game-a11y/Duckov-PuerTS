@@ -18,7 +18,7 @@ namespace Puerts
     public interface ILoader
     {
         bool FileExists(string filepath);
-        string ReadFile(string filepath, out string debugpath);
+        string? ReadFile(string filepath, out string debugpath);
     }
     public interface IModuleChecker
     {
@@ -30,7 +30,7 @@ namespace Puerts
 #endif
     public interface IResolvableLoader
     {
-        string Resolve(string specifier, string referrer);
+        string? Resolve(string specifier, string referrer);
     }
 
     /*
