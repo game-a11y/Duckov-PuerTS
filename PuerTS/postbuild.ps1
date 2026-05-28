@@ -7,19 +7,15 @@ Write-Host "Copying Assets to Release Dir"
 
 # Ensure release directories exist
 $ReleaseDir = "$ProjectDir\PuerTS"
-$null = New-Item -ItemType Directory -Force "$ReleaseDir\upm\Editor\Resources"
 $null = New-Item -ItemType Directory -Force "$ReleaseDir\upm\Runtime\Resources"
 $null = New-Item -ItemType Directory -Force "$ReleaseDir\Scripts"
 
 # Copy Runtime files
-if (Test-Path "$ProjectDir\upm\Editor\Resources") {
-    Copy-Item "$ProjectDir\upm\Editor\Resources\*" "$ProjectDir\PuerTS\upm\Editor\Resources\" -Recurse -Force
-}
 Copy-Item "$ProjectDir\upm\Runtime\Resources\*" "$ProjectDir\PuerTS\upm\Runtime\Resources\" -Recurse -Force
-Copy-Item "$ProjectDir\Scripts\*" "$ProjectDir\PuerTS\Scripts\" -Recurse -Force
+Copy-Item "$ProjectDir\upm\Plugins\x86_64\*.dll" "$ProjectDir\PuerTS\" -Force
 Copy-Item "$ProjectDir\upm\LICENSE" "$ProjectDir\PuerTS\Puerts+V8-LICENSE.txt" -Force
 Copy-Item "$ProjectDir\upm\package.json" "$ProjectDir\PuerTS\upm\" -Force
-Copy-Item "$ProjectDir\upm\Plugins\x86_64\*.dll" "$ProjectDir\PuerTS\" -Force
+Copy-Item "$ProjectDir\Scripts\*" "$ProjectDir\PuerTS\Scripts\" -Recurse -Force
 
 # Copy MOD dll
 Copy-Item "$TargetDir\PuerTS.dll" "$ProjectDir\PuerTS\" -Force
