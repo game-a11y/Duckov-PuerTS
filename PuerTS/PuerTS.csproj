@@ -5,6 +5,8 @@
     <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <Version>$(ModVersion)</Version>
+    <Authors>inkydragon,game-a11y/Duckov-PuerTS</Authors>
+    <Copyright>Copyright (c) 2025 Chengyu HAN</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="$(DuckovPath)\Duckov_Data\Managed\TeamSoda.*" />

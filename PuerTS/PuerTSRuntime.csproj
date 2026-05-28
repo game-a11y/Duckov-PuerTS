@@ -8,6 +8,8 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <Version>$(RuntimeVersion)</Version>
+    <Authors>Tencent</Authors>
+    <Copyright>Copyright (C) 2020 Tencent. All rights reserved.</Copyright>
   </PropertyGroup>
 
   <!-- Only compile PuerTS runtime sources, skip mod-specific code -->
