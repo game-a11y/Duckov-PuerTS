@@ -7,6 +7,8 @@
 
 ## [Unreleased]
 
+## [V0.4.1] - 2026-05-28
+
 ### 新增
 
 - 添加 `VersionChecker`，在 `OnAfterSetup` 中自动检测 `info.ini` 版本与项目版本是否一致
