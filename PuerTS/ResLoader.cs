@@ -123,11 +123,3 @@ public class ResLoader : IResolvableLoader, ILoader, IModuleChecker
         nullFiles.Add(fileName);
     }
 }
-
-namespace UnityEngine.Scripting
-{
-    class PreserveAttribute : System.Attribute
-    {
-
-    }
-}
