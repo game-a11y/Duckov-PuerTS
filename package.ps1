@@ -11,14 +11,12 @@ $ModDir = Join-Path $RepoRoot 'PuerTS' 'PuerTS'
 & "$RepoRoot\build.ps1" -Configuration $Configuration
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-# Step 2: Resolve version from info.ini if not specified
+# Step 2: Resolve version from Directory.Build.props if not specified
 if (-not $Version) {
-    $iniPath = Join-Path $RepoRoot 'PuerTS' 'info.ini'
-    $ini = Get-Content $iniPath
-    $versionMatch = $ini | Select-String 'displayName.*V(\d+\.\d+)'
-    if ($versionMatch) {
-        $Version = $versionMatch.Matches[0].Groups[1].Value
-    } else {
+    $propsPath = Join-Path $RepoRoot 'PuerTS' 'Directory.Build.props'
+    $props = [xml](Get-Content $propsPath)
+    $Version = $props.Project.PropertyGroup.ModVersion
+    if (-not $Version) {
         $Version = '0.0'
     }
 }

@@ -7,6 +7,7 @@
     <RootNamespace>Puerts</RootNamespace>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Version>$(RuntimeVersion)</Version>
   </PropertyGroup>
 
   <!-- Only compile PuerTS runtime sources, skip mod-specific code -->
