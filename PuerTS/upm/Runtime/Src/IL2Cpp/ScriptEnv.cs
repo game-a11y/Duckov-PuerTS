@@ -36,6 +36,8 @@ namespace Puerts
         protected int debugPort;
 
         public Backend backend;
+
+        public Backend Backend => backend;
         
         PuertsIl2cpp.ObjectPool objectPool = new PuertsIl2cpp.ObjectPool();
 
@@ -77,7 +79,7 @@ namespace Puerts
                         var reg_api = Marshal.PtrToStructure<pesapi_reg_api>(prapi);
                         registry = reg_api.create_registry();
                         Puerts.NativeAPI.InitialPuerts(prapi, registry);
-                        extensionMethodGetMethodInfo = typeof(PuertsIl2cpp.ExtensionMethodInfo).GetMethod("Get");
+                        extensionMethodGetMethodInfo = typeof(Puerts.ExtensionMethodInfo).GetMethod("Get");
                         Puerts.NativeAPI.SetExtensionMethodGet(extensionMethodGetMethodInfo);
 
                         persistentObjectInfoType = typeof(Puerts.ScriptObject);
@@ -85,7 +87,7 @@ namespace Puerts
                         Puerts.NativeAPI.SetGlobalType_ArrayBuffer(typeof(ArrayBuffer));
                         Puerts.NativeAPI.SetGlobalType_ScriptObject(typeof(ScriptObject));
 
-                        PuertsIl2cpp.ExtensionMethodInfo.LoadExtensionMethodInfo();
+                        Puerts.ExtensionMethodInfo.LoadExtensionMethodInfo();
                         isInitialized = true;
                     }
                 }
@@ -181,13 +183,13 @@ namespace Puerts
         [UnityEngine.Scripting.Preserve]
         public Type GetTypeByString(string className)
         {
-            return PuertsIl2cpp.TypeUtils.GetType(className);
+            return Puerts.TypeUtils.GetType(className);
         }
         
         [UnityEngine.Scripting.Preserve]
         public void LoadAddon(string name)
         {
-            Type type = PuertsIl2cpp.TypeUtils.GetType("Puerts." + name + "Native");
+            Type type = Puerts.TypeUtils.GetType("Puerts." + name + "Native");
             type.GetMethod("Register").Invoke(null, new object[] { PuertsNative.GetRegisterApi(), registry });
         }
 
