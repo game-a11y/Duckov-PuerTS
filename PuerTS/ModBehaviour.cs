@@ -1,4 +1,4 @@
-﻿using Puerts;
+using Puerts;
 using System;
 using UnityEngine;
 
@@ -17,19 +17,20 @@ namespace PuerTS
         public Action? JsOnDisable;
         public Action? JsOnDestroy;
 
-        // TODO: 修复过时的类使用，改用 ScriptEnv
-        static JsEnv? jsEnv;
+        static ScriptEnv? scriptEnv;
 
         void Awake()
         {
             Debug.Log($"[{MOD_NAME}]: MOD Start.");
 
-            Debug.Log($"[{MOD_NAME}]: JsEnv init with debugPort={DebugPort}");
-            jsEnv = new JsEnv(new ResLoader(), DebugPort);
+            Debug.Log($"[{MOD_NAME}]: ScriptEnv init with debugPort={DebugPort}");
 
-            // TODO: 检查是否需要改成 Action<ModBehaviour>
+            var loader = new ResLoader();
+            var backend = new BackendV8(loader);
+            scriptEnv = new ScriptEnv(backend, DebugPort);
+
             // NOTE: `Scripts/` 文件夹已经在搜索路径中了，脚本路径无需再添加前缀
-            var init = jsEnv.ExecuteModule<Action<MonoBehaviour>>("index.mjs", "init");
+            var init = scriptEnv.ExecuteModule("index.mjs").Get<Action<MonoBehaviour>>("init");
 
             if (init != null) init(this);
         }
@@ -41,10 +42,10 @@ namespace PuerTS
             JsOnDisable = null;
             JsOnDestroy = null;
 
-            if (jsEnv != null)
+            if (scriptEnv != null)
             {
-                jsEnv.Dispose();
-                jsEnv = null;
+                scriptEnv.Dispose();
+                scriptEnv = null;
             }
             Debug.Log($"[{MOD_NAME}]: MOD Destroy.");
         }
